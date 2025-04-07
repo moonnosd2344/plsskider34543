@@ -6435,20 +6435,19 @@ Volcanic:AddButton({
     end
 })
 Toggle = Volcanic:AddToggle("Toggle", {Title = "Auto Find Island", Default = false})
+
 Toggle:OnChanged(function(Value)
     if Value then
         task.spawn(function()
-            -- Biến cục bộ tránh spam
             if _G._PREHISTORIC_RUNNING then return end
             _G._PREHISTORIC_RUNNING = true
 
-            -- TELEPORT
             local Players = game:GetService("Players")
             local ReplicatedStorage = game:GetService("ReplicatedStorage")
             local Workspace = game:GetService("Workspace")
             local TweenService = game:GetService("TweenService")
-            local LocalPlayer = Players.LocalPlayer
 
+            local LocalPlayer = Players.LocalPlayer
             local PrehistoricDetected = false
             local currentTween = nil
 
@@ -6498,25 +6497,30 @@ Toggle:OnChanged(function(Value)
             local function findAndSitBoat(boatName)
                 local hrp = LocalPlayer.Character:WaitForChild("HumanoidRootPart")
                 local BoatsFolder = workspace:WaitForChild("Boats")
-                for _, boat in pairs(BoatsFolder:GetChildren()) do
-                    if boat:IsA("Model") and boat.Name == boatName then
-                        local seat = boat:FindFirstChild("VehicleSeat", true)
-                        if seat and not seat.Occupant then
-                            hrp.CFrame = seat.CFrame * CFrame.new(0, 0, 3)
-                            task.wait(1)
-                            hrp.CFrame = seat.CFrame
-                            task.wait(1.5)
-                            local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                            if hum then hum:Move(Vector3.new(0, 0, 1), true) end
-                            task.wait(1)
-                            if seat.Occupant and seat.Occupant.Parent == LocalPlayer.Character then
-                                print("Ngồi ghế lái thành công")
-                                return seat
+
+                local maxTry = 50
+                for i = 1, maxTry do
+                    for _, boat in pairs(BoatsFolder:GetChildren()) do
+                        if boat:IsA("Model") and boat.Name == boatName then
+                            local seat = boat:FindFirstChild("VehicleSeat", true)
+                            if seat and not seat.Occupant then
+                                hrp.CFrame = seat.CFrame * CFrame.new(0, 0, 3)
+                                task.wait(0.5)
+                                hrp.CFrame = seat.CFrame
+                                task.wait(0.5)
+                                local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                                if hum then hum:Move(Vector3.new(0, 0, 1), true) end
+                                task.wait(1)
+                                if seat.Occupant and seat.Occupant.Parent == LocalPlayer.Character then
+                                    print("Đã ngồi vào thuyền thành công")
+                                    return seat
+                                end
                             end
                         end
                     end
+                    task.wait(0.3)
                 end
-                warn("Không tìm thấy thuyền hoặc không thể ngồi.")
+                warn("Không thể ngồi vào ghế")
                 return nil
             end
 
@@ -6533,13 +6537,17 @@ Toggle:OnChanged(function(Value)
                 end
                 setNoClip(boat, true)
                 setNoClip(LocalPlayer.Character, true)
+
                 local currentPos = primary.Position
                 local finalY = 100
                 primary.CFrame = CFrame.new(currentPos.X, finalY, currentPos.Z)
+
                 local distance = (Vector3.new(targetPos.X, finalY, targetPos.Z) - primary.Position).Magnitude
                 local tweenTime = distance / 350
+
                 local info = TweenInfo.new(tweenTime, Enum.EasingStyle.Linear)
                 local goal = { CFrame = CFrame.new(targetPos.X, finalY, targetPos.Z) }
+
                 currentTween = TweenService:Create(primary, info, goal)
                 currentTween:Play()
 
@@ -6556,25 +6564,25 @@ Toggle:OnChanged(function(Value)
                 end)
             end
 
-            -- CHẠY QUY TRÌNH
+            -- 🧭 CHẠY QUY TRÌNH
             teleportToBoatDealer()
             task.wait(2)
             spawnBoat()
-            print(" Đã tạo PirateGrandBrigade!")
+            task.wait(2.5) -- Đợi boat xuất hiện
 
             local seat = findAndSitBoat("PirateGrandBrigade")
             if not seat then
-                warn(" Không thể ngồi vào thuyền.")
+                warn("Không thể ngồi vào thuyền.")
                 _G._PREHISTORIC_RUNNING = false
                 return
             end
 
-            print("🧭 Bắt đầu bay đến tọa độ Prehistoric...")
+            print("Bắt đầu bay đến tọa độ Prehistoric...")
             local prehistoricPos = Vector3.new(-99999999, 100, 0)
             tweenBoatToTarget(prehistoricPos)
         end)
     else
-        print(" Auto Find Island đã bị tắt.")
+        print("Đã tắt Auto Find Island.")
         _G._PREHISTORIC_RUNNING = false
     end
 end)
