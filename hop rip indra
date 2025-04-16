@@ -5,7 +5,7 @@ local function scrapeAPI()
     local req = (syn and syn.request) or (http and http.request) or request
     local success, response = pcall(function()
         return req({
-            Url = "https://hostserver.porry.store/bloxfruit/bot/JobId/indra",
+            Url = "http://apiteddy.ddns.net:31447/Api/Rip",
             Method = "GET"
         })
     end)
