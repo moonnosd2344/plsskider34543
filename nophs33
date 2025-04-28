@@ -1,6 +1,5 @@
 local TweenService = game:GetService("TweenService")
 
--- Hàm Tween để bay mượt
 function topos(Pos)
     local player = game.Players.LocalPlayer
     local char = player.Character
@@ -11,23 +10,19 @@ function topos(Pos)
     if humanoid.Sit then humanoid.Sit = false end
 
     local distance = (Pos.Position - hrp.Position).Magnitude
-    local speed = 300 -- Tốc độ bay chậm hơn để tránh văng
+    local speed = 300
     local duration = distance / speed
 
-    -- Kiểm tra nếu đang bay thì hủy tween cũ
     if _G.CurrentTween then
         _G.CurrentTween:Cancel()
     end
 
-    -- Tạo tween mới
     local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear)
     local tween = TweenService:Create(hrp, tweenInfo, {CFrame = Pos})
     _G.CurrentTween = tween
 
-    -- Bắt đầu bay
     tween:Play()
 
-    -- Giữ nhân vật không bị rớt
     spawn(function()
         while tween.PlaybackState == Enum.PlaybackState.Playing do
             if _G.StopTween then
@@ -42,14 +37,12 @@ function topos(Pos)
         end
     end)
 
-    -- Đảm bảo vị trí cuối cùng chính xác
     tween.Completed:Wait()
     if not _G.StopTween then
         hrp.CFrame = Pos
     end
 end
 
--- Bay đến đảo
 _G.MysticIsland = true
 spawn(function()
     while wait(1) do
@@ -57,7 +50,7 @@ spawn(function()
             local mysticIsland = game:GetService("Workspace").Map:FindFirstChild("MysticIsland")
             if mysticIsland then
                 local position = mysticIsland.WorldPivot.Position
-                topos(CFrame.new(position.X, position.Y + 100, position.Z)) -- Bay cao hơn tránh rớt
+                topos(CFrame.new(position.X, position.Y + 100, position.Z))
                 _G.MysticIsland = false
                 wait(2)
                 _G.AutoLockMoon = true
@@ -66,7 +59,6 @@ spawn(function()
     end
 end)
 
--- Tự động nhìn lên trăng
 spawn(function()
     while wait(1) do
         pcall(function()
@@ -79,7 +71,6 @@ spawn(function()
     end
 end)
 
--- Bật phím T để kích hoạt tộc V3
 spawn(function()
     while wait(1) do
         pcall(function()
@@ -89,7 +80,6 @@ spawn(function()
                 game:GetService("VirtualInputManager"):SendKeyEvent(false, "T", false, game)
                 print("🟢")
 
-                -- Đợi 5 giây trước khi bay đến bánh răng
                 wait(5)
                 _G.AutoLockMoon = false
                 _G.TweenMGear = true
@@ -98,7 +88,6 @@ spawn(function()
     end
 end)
 
--- Bay đến bánh răng trên đảo
 _G.TweenMGear = false
 spawn(function()
     while wait(1) do
