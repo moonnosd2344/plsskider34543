@@ -1,1 +1,48 @@
-cc
+local TS
+
+
+local function scrapeAPI()
+    local req = (syn and syn.request) or (http and http.request) or request
+    local success, response = pcall(function()
+        return req({
+            Url = "https://ducdesigner.site/JobId/haki",
+            Method = "GET"
+        })
+    end)
+
+    if success and response and response.Body then
+        local data = game.HttpService:JSONDecode(response.Body)
+        if data.Amount and data.Amount > 0 then
+            local jobIds = {}
+            for _, job in ipairs(data.JobId) do
+                for jobId, _ in pairs(job) do
+                    table.insert(jobIds, jobId)
+                end
+            end
+            TS = tick()
+            return jobIds
+        end
+    else
+        warn("")
+    end
+
+    return nil
+end
+
+local function autoHopServer()
+    local jobIds = scrapeAPI()
+    if not jobIds then
+        warn("")
+        return
+    end
+
+    for _, jobId in ipairs(jobIds) do
+        pcall(function()
+            
+            game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer("teleport", jobId)
+            task.wait(5)
+        end)
+    end
+end
+
+autoHopServer()
