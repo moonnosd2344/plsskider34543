@@ -5,7 +5,7 @@ local function scrapeAPI()
     local req = (syn and syn.request) or (http and http.request) or request
     local success, response = pcall(function()
         return req({
-            Url = "http://apiteddy.ddns.net:31447/Api/Rip",
+            Url = "https://ducdesigner.site/JobId/indra",
             Method = "GET"
         })
     end)
@@ -23,7 +23,7 @@ local function scrapeAPI()
             return jobIds
         end
     else
-        warn("Lỗi lấy dữ liệu từ API!")
+        warn("")
     end
 
     return nil
@@ -32,7 +32,7 @@ end
 local function autoHopServer()
     local jobIds = scrapeAPI()
     if not jobIds then
-        warn("Không tìm thấy JobId từ API!")
+        warn("")
         return
     end
 
